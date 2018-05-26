@@ -1,10 +1,12 @@
 
 var util = require('util');
+var CloudWatchLogs = require('aws-sdk/clients/cloudwatchlogs');
 var Writable = require('stream').Writable;
-var AWS = require('aws-sdk');
 var safeJsonStringify = require('safe-json-stringify');
 
 var jsonStringify = safeJsonStringify ? safeJsonStringify : JSON.stringify;
+
+let AWS;
 
 module.exports = createCloudWatchStream;
 
@@ -21,9 +23,11 @@ function CloudWatchStream(opts) {
 
   if (opts.AWS) {
     AWS = opts.AWS;
+  } else {
+    AWS = require('aws-sdk/global');
   }
 
-  this.cloudwatch = new AWS.CloudWatchLogs(opts.cloudWatchLogsOptions);
+  this.cloudwatch = new CloudWatchLogs(opts.cloudWatchLogsOptions);
   this.queuedLogs = [];
   this.sequenceToken = null;
   this.writeQueued = false;
